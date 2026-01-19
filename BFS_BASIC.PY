@@ -1,62 +1,51 @@
 from collections import deque
 
 
+def bfs(graph, root):
+    visited = set()
+    queue = deque([root])
+    visited.add(root)
+
+    parent = {root: None}
+
+    print("\nBFS Traversal:")
+    while queue:
+        vertex = queue.popleft()
+        print(vertex, end=" ")
+
+        for neighbour in graph[vertex]:
+            if neighbour not in visited:
+                visited.add(neighbour)
+                parent[neighbour] = vertex
+                queue.append(neighbour)
+
+    print()
+    return parent
+
+
+def print_bfs_tree(parent):
+    print("\nBFS Tree (Parent -> Child):")
+    for node in parent:
+        if parent[node] is not None:
+            print(f"{parent[node]} -> {node}")
+
+
+
+
 n = int(input("Enter number of nodes: "))
+nodes = list(map(int, input("Enter node values: ").split()))
 
-V = input("Enter node values: ").split()
-
-
-g = {x: [] for x in V}
+graph = {node: [] for node in nodes}
 
 m = int(input("Enter number of edges: "))
-
 print("Enter edges (u v):")
+
 for _ in range(m):
-    a, b = input().split()
-    g[a].append(b)
-    g[b].append(a)
+    u, v = map(int, input().split())
+    graph[u].append(v)
+    graph[v].append(u)
 
-start = input("Enter starting node: ")
+start = int(input("Enter starting node: "))
 
-q = deque([start])
-visited = set()
-parent = {start: None}
-step = 1
-
-
-def get_path(node):
-    path = []
-    while node is not None:
-        path.append(node)
-        node = parent[node]
-    return path[::-1]
-
-
-while q:
-    x = q.popleft()
-    visited.add(x)
-
-    unvisited = set(V) - visited
-
-    print(f"\nStep {step}")
-    print("Source node:", x)
-    print("Adjacent:", g[x])
-    print("Visited:", visited)
-    print("Unvisited:", unvisited)
-    print("Path:", " -> ".join(get_path(x)))
-
-    for y in g[x]:
-        if y not in visited and y not in q:
-            q.append(y)
-            parent[y] = x
-
-    step += 1
-
-
-
-print("\nOptimal Solution (Shortest paths from source):")
-for node in V:
-    if node in parent:
-        print(f"{start} -> {node}: {' -> '.join(get_path(node))}")
-    else:
-        print(f"{start} -> {node}: No path")
+parent = bfs(graph, start)
+print_bfs_tree(parent)
